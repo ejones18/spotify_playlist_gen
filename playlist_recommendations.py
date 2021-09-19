@@ -23,6 +23,11 @@ from spotipy.oauth2 import SpotifyOAuth
 
 ROOT_PATH = os.path.dirname(os.path.realpath(__file__))
 
+##Insert your own Spotify API credentials here##
+CLIENT_ID = ""
+CLIENT_SECRET = ""
+REDIRECT_URI = ""
+
 def main(artist, track, save=None):
     """
     Generate a 25 song-long playlist based on a randomly chosen input song.
