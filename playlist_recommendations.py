@@ -207,7 +207,7 @@ def print_output(json_response):
 def parse_options():
     """Parse command line options."""
     parser = argparse.ArgumentParser(description=("This is a command line interface (CLI) for "
-                                                  "the playlist_reccomendation module"),
+                                                  "the playlist_recommendation module"),
                                      epilog="Ethan Jones, 2020-05-25")
     parser.add_argument("--artist", dest="artist", action="store", type=str,
                         required=True, help="Artist name.")
