@@ -53,13 +53,13 @@ def main(artist : str, track : str, save : bool = None):
     else:
         print_output(json_response)
 
-def add_tracks_to_playlist(json_response : Object, playlist_name : str):
+def add_tracks_to_playlist(json_response : dict, playlist_name : str):
     """
     Adds tracks to spotify playlist.
     
     Parameters
     ==========
-    `json_response` : Object
+    `json_response` : dict
         A json object structured as per the Spotify Web API documentation for this funcionality.
     `playlist_name` : str
         The name of the generated playlist.
@@ -223,13 +223,13 @@ def search_artist_track(artist : str, track : str):
     seeds = get_track_artist_id_from_json(json_response)
     return seeds
 
-def get_track_artist_id_from_json(json_response : Object):
+def get_track_artist_id_from_json(json_response : dict):
     """
     Gets the track and artist ID from the json response from the API search.
     
     Parameters
     ----------
-    `json_response` : Object
+    `json_response` : dict
         A json object structured as per the Spotify Web API documentation for this funcionality.
         
     Returns
@@ -300,7 +300,7 @@ def query_api(seeds : List):
     
     Return
     ------
-    `json_response` : Object
+    `json_response` : dict
         A json object structured as per the Spotify Web API documentation for this specific
         funcionality.
     """
@@ -315,13 +315,13 @@ def query_api(seeds : List):
     json_response = response.json()
     return json_response
 
-def print_output(json_response : Object):
+def print_output(json_response : dict):
     """
     Prints the output.
     
     Parameters
     ----------
-    `json_response` : Object
+    `json_response` : dict
         A json object structured as per the Spotify Web API documentation for the different
         funcionalities.
     """
