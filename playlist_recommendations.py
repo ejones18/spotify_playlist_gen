@@ -12,6 +12,7 @@ import random
 import os
 import sys
 import time
+from typing import List, Union, Tuple
 
 import pickle
 import spotipy
@@ -28,9 +29,18 @@ CLIENT_ID = ""
 CLIENT_SECRET = ""
 REDIRECT_URI = ""
 
-def main(artist, track, save=None):
+def main(artist : str, track : str, save : bool = None):
     """
     Generate a 25 song-long playlist based on a randomly chosen input song.
+    
+    Parameters
+    ----------
+    `artist` : str
+        The artist in which the generated playlist is based off of.
+    `track` : str
+        The track in which the generated playlist is based off of.
+    `save` : bool
+        OPtion to save the generated playlist to the Spofity account.
     """
     seeds = search_artist_track(artist, track)
     json_response = query_api(seeds)
@@ -43,8 +53,17 @@ def main(artist, track, save=None):
     else:
         print_output(json_response)
 
-def add_tracks_to_playlist(json_response, playlist_name):
-    """Adds tracks to spotify playlist."""
+def add_tracks_to_playlist(json_response : Object, playlist_name : str):
+    """
+    Adds tracks to spotify playlist.
+    
+    Parameters
+    ==========
+    `json_response` : Object
+        A json object structured as per the Spotify Web API documentation for this funcionality.
+    `playlist_name` : str
+        The name of the generated playlist.
+    """
     playlist_id = fetch_playlist_id(playlist_name)
     uris = []
     for i, j in enumerate(json_response['tracks']):
@@ -58,7 +77,19 @@ def add_tracks_to_playlist(json_response, playlist_name):
     print("Playlist saved!")
 
 def fetch_playlist_id(playlist_name):
-    """Fetches playlist id for playlist."""
+    """
+    Fetches playlist id for playlist.
+    
+    Parameters
+    ----------
+    `playlist_name` : str
+        The name of the generated playlist.
+    
+    Returns
+    -------
+    `playlist_id` : str
+        The id of the relevant playlist.
+    """
     scope = "playlist-modify-public"
     sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=CLIENT_ID,
                                                 client_secret=CLIENT_SECRET,
@@ -69,8 +100,22 @@ def fetch_playlist_id(playlist_name):
         if playlist['name'] == playlist_name:
             return playlist['id']
 
-def create_playlist(artist, track):
-    """Create playlist on Spotify account."""
+def create_playlist(artist : str, track : str):
+    """
+    Create playlist on Spotify account.
+    
+    Parameters
+    ----------
+    `artist` : str
+        The artist in which the generated playlist is based off of.
+    `track` : str
+        The track in which the generated playlist is based off of.
+    
+    Returns
+    =======
+    `playlist_name` : str
+        The generator playlist name.
+    """
     scope = "playlist-modify-public"
     sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=CLIENT_ID,
                                                 client_secret=CLIENT_SECRET,
@@ -82,7 +127,14 @@ def create_playlist(artist, track):
     return playlist_name
 
 def acquire_token():
-    """Fetches a Spotify web API token"""
+    """
+    Fetches a Spotify web API token
+    
+    Returns
+    -------
+    `token` : str
+        A Spotify Web API access token.
+    """
     token_cache_dir = os.path.join(ROOT_PATH, "cache")
     token_cache_file = os.path.join(token_cache_dir, "token.p")
     if os.path.exists(token_cache_file):
@@ -112,8 +164,20 @@ def acquire_token():
             pickle.dump(token, fid)
         return token
 
-def fetch_artist_genre(artist_id):
-    """Fetches a genre of the artist."""
+def fetch_artist_genre(artist_id : str):
+    """
+    Fetches a genre of the artist.
+    
+    Parameters
+    ----------
+    `artist_id` : str
+        The artist id of the relevant musical artist.
+    
+    Returns
+    -------
+    `genre` : str
+        A randomised genre from the artist.
+    """
     endpoint_url = f'https://api.spotify.com/v1/artists/{artist_id}'
     query = f'{endpoint_url}'
     settings = define_settings()
@@ -130,9 +194,22 @@ def fetch_artist_genre(artist_id):
     genre = genres[index]
     return genre
 
-def search_artist_track(artist, track):
+def search_artist_track(artist : str, track : str):
     """
     Searches the Spotify API for the artist and track, returns the json response.
+    
+    Parameters
+    ----------
+    `artist` : str
+        The musical artist that performed the accompanying track
+    `track` : str
+        The track that was performed by the accompanying artist.
+    
+    Returns
+    -------
+    `seeds` : List
+        List whereby the first element is the artist id, the second being the track id and the last
+        being the genre.
     """
     track = track.replace(" ", "+")
     settings = define_settings()
@@ -146,9 +223,20 @@ def search_artist_track(artist, track):
     seeds = get_track_artist_id_from_json(json_response)
     return seeds
 
-def get_track_artist_id_from_json(json_response):
+def get_track_artist_id_from_json(json_response : Object):
     """
     Gets the track and artist ID from the json response from the API search.
+    
+    Parameters
+    ----------
+    `json_response` : Object
+        A json object structured as per the Spotify Web API documentation for this funcionality.
+        
+    Returns
+    -------
+    `seeds` : List
+        List whereby the first element is the artist id, the second being the track id and the last
+        being the genre.
     """
     try:
         artist_id = json_response['tracks']['items'][0]['artists'][0]['id']
@@ -163,15 +251,34 @@ def get_track_artist_id_from_json(json_response):
 def define_settings():
     """
     Sets the endpoint as well as defines the token.
+    
+    Returns
+    -------
+    `settings` : List
+        List whereby the first element is the endpoint_url and the second element is the web api
+        token.
     """
     endpoint_url = "https://api.spotify.com/v1/recommendations?"
     token = acquire_token()
     settings = [endpoint_url, token]
     return settings
 
-def define_filters(seeds):
+def define_filters(seeds : List):
     """
     Sets the filters i.e. number of songs and genre.
+    
+    Parameters
+    ----------
+    `seeds` : List
+        List whereby the first element is the artist id, the second being the track id and the last
+        being the genre.
+    
+    Returns
+    -------
+    `filters` : List
+        List whereby the first element is the number of songs limit, the second being the
+        appropriate Spotify market, the third being the seed_genres, the fourth being the 
+        seed_artists and the final being the seed_tracks.
     """
     limit = 25
     market = "GB"
@@ -181,9 +288,21 @@ def define_filters(seeds):
     filters = [limit, market, seed_genres, seed_artists, seed_tracks]
     return filters
 
-def query_api(seeds):
+def query_api(seeds : List):
     """
     Queries the Spotify API and returns a json response.
+    
+    Parameters
+    ----------
+    `seeds` : List
+        List whereby the first element is the artist id, the second being the track id and the last
+        being the genre.
+    
+    Return
+    ------
+    `json_response` : Object
+        A json object structured as per the Spotify Web API documentation for this specific
+        funcionality.
     """
     settings = define_settings()
     filters = define_filters(seeds)
@@ -196,9 +315,15 @@ def query_api(seeds):
     json_response = response.json()
     return json_response
 
-def print_output(json_response):
+def print_output(json_response : Object):
     """
     Prints the output.
+    
+    Parameters
+    ----------
+    `json_response` : Object
+        A json object structured as per the Spotify Web API documentation for the different
+        funcionalities.
     """
     print('Playlist: ')
     for i, j in enumerate(json_response['tracks']):
